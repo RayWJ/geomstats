@@ -51,15 +51,19 @@ from engine import WorldOS
 # PYDANTIC MODELS
 # ============================================================================
 
-class EntityCreateRequest(BaseModel):
-    entity_id: str = Field(..., description="Unique entity identifier")
+class EntityMetadata(BaseModel):
     level: int = Field(3, ge=1, le=5, description="Cognitive level (1-5)")
     domain: str = Field("tech", description="Domain (tech, finance, etc.)")
     stance: float = Field(0.0, ge=-1.0, le=1.0, description="Stance (-1 to 1)")
     intent: float = Field(0.0, ge=-1.0, le=1.0, description="Intent (-1 to 1)")
     time: float = Field(0.0, ge=-1.0, le=1.0, description="Time focus")
     scale: float = Field(0.0, ge=-1.0, le=1.0, description="Scale")
-    body: str = Field("", description="Markdown body content")
+
+
+class EntityCreateRequest(BaseModel):
+    entity_id: str = Field(..., description="Unique entity identifier")
+    metadata: EntityMetadata = Field(..., description="Entity metadata")
+    description: str = Field("", description="Entity description")
 
 
 class TickRequest(BaseModel):
@@ -206,39 +210,61 @@ async def health_check():
 async def create_entity(request: EntityCreateRequest):
     """Create a new entity in the world state."""
     try:
-        # Create metadata
+        from datetime import datetime
+        meta = request.metadata
+        
+        # Create metadata dict
         metadata = {
-            "level": f"L{request.level}",
-            "domain": request.domain,
-            "stance": request.stance,
-            "intent": request.intent,
-            "time": request.time,
-            "scale": request.scale
+            "level": f"L{meta.level}",
+            "domain": meta.domain,
+            "stance": meta.stance,
+            "intent": meta.intent,
+            "time": meta.time,
+            "scale": meta.scale
         }
         
         # Encode to get coordinates
         point = world_os.manifold.encode_state(
-            level=request.level,
-            domain=request.domain,
-            stance=request.stance,
-            intent=request.intent,
-            time=request.time,
-            scale=request.scale
+            level=meta.level,
+            domain=meta.domain,
+            stance=meta.stance,
+            intent=meta.intent,
+            time=meta.time,
+            scale=meta.scale
         )
         
         metadata["coordinates"] = point.tolist()
+        
+        # Create body
+        body = f"""# Entity: {request.entity_id}
+
+{request.description}
+
+## Properties
+- Level: {metadata['level']}
+- Domain: {metadata['domain']}
+- Stance: {metadata['stance']}
+- Intent: {metadata['intent']}
+- Time: {metadata['time']}
+- Scale: {metadata['scale']}
+
+## Coordinates
+{metadata['coordinates']}
+
+Created via API at {datetime.now().isoformat()}.
+"""
         
         # Write to database
         world_os.db.write_entity(
             entity_id=request.entity_id,
             metadata=metadata,
-            body=request.body or f"# Entity: {request.entity_id}\n\nCreated via API."
+            body=body
         )
         
         return EntityResponse(
             entity_id=request.entity_id,
             metadata=metadata,
-            body=request.body,
+            body=body,
             coordinates=point.tolist()
         )
     
@@ -288,16 +314,28 @@ async def run_episode(entity_id: str, request: EpisodeRequest):
             llm_frequency=request.llm_frequency
         )
         
+        # Convert numpy arrays to lists
+        json_results = []
+        for r in results:
+            r_copy = r.copy()
+            if "decoded" in r_copy and "coordinates" in r_copy["decoded"]:
+                coords = r_copy["decoded"]["coordinates"]
+                if hasattr(coords, 'tolist'):
+                    r_copy["decoded"]["coordinates"] = coords.tolist()
+            json_results.append(r_copy)
+        
         return {
             "status": "success",
             "entity_id": entity_id,
-            "total_ticks": len(results),
-            "total_distance": sum(r["distance"] for r in results),
-            "interventions": sum(1 for r in results if r["intervention"]),
-            "results": results
+            "total_ticks": len(json_results),
+            "total_distance": sum(r["distance"] for r in json_results),
+            "interventions": sum(1 for r in json_results if r["intervention"]),
+            "results": json_results
         }
     
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
