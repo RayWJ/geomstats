@@ -365,8 +365,10 @@
     </div>
 
     <script>
-        // API base URL (adjust if deployed elsewhere)
-        const API_BASE = 'http://localhost:8000';
+        // API base URL - automatically detect or use public sandbox URL
+        const API_BASE = window.location.hostname.includes('sandbox.novita.ai') 
+            ? 'https://8000-i5c2ywpdmon8woe0l978h-ad490db5.sandbox.novita.ai'
+            : 'http://localhost:8000';
 
         // Update slider value displays
         document.getElementById('n_viewpoints').addEventListener('input', (e) => {
