@@ -460,13 +460,15 @@
             
             const entityData = {
                 entity_id: document.getElementById('entityId').value,
-                level: parseInt(document.getElementById('entityLevel').value),
-                domain: document.getElementById('entityDomain').value,
-                stance: parseFloat(document.getElementById('entityStance').value),
-                intent: parseFloat(document.getElementById('entityIntent').value),
-                time: 0.0,
-                scale: 0.0,
-                body: `# Entity: ${document.getElementById('entityId').value}\n\nCreated via frontend.`
+                metadata: {
+                    level: parseInt(document.getElementById('entityLevel').value),
+                    domain: document.getElementById('entityDomain').value,
+                    stance: parseFloat(document.getElementById('entityStance').value),
+                    intent: parseFloat(document.getElementById('entityIntent').value),
+                    time: 0.0,
+                    scale: 0.0
+                },
+                description: `🎯 Entity: ${document.getElementById('entityId').value}\n\nCreated via frontend.`
             };
             
             try {

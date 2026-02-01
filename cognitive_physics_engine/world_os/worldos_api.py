@@ -272,6 +272,25 @@ Created via API at {datetime.now().isoformat()}.
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/entity/list")
+async def list_entities():
+    """List all entities."""
+    entities = world_os.db.query_entities()
+    
+    return {
+        "count": len(entities),
+        "entities": [
+            {
+                "id": e["id"],
+                "level": e["metadata"].get("level"),
+                "domain": e["metadata"].get("domain"),
+                "stance": e["metadata"].get("stance")
+            }
+            for e in entities
+        ]
+    }
+
+
 @app.get("/api/entity/{entity_id}", response_model=EntityResponse)
 async def get_entity(entity_id: str):
     """Get entity state."""
@@ -338,24 +357,6 @@ async def run_episode(entity_id: str, request: EpisodeRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.get("/api/entity/list")
-async def list_entities():
-    """List all entities."""
-    entities = world_os.db.query_entities()
-    
-    return {
-        "count": len(entities),
-        "entities": [
-            {
-                "id": e["id"],
-                "level": e["metadata"].get("level"),
-                "domain": e["metadata"].get("domain"),
-                "stance": e["metadata"].get("stance")
-            }
-            for e in entities
-        ]
-    }
 
 
 # ----------------------------------------------------------------------------
