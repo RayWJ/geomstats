@@ -53,6 +53,7 @@ from manifold import CognitiveManifold
 from dynamics import PhysicsEngine, PotentialField
 from translator import NeuroSymbolicTranslator
 from markdown_db import MarkdownDB
+from llm_agent import LLMAgent
 
 
 class WorldOS:
@@ -69,7 +70,9 @@ class WorldOS:
                  world_state_dir: str = "world_state",
                  gamma: float = 0.3,
                  sigma: float = 0.05,
-                 tick_duration: float = 1.0):
+                 tick_duration: float = 1.0,
+                 llm_model: str = "gpt-4",
+                 llm_api_key: Optional[str] = None):
         """
         Initialize WorldOS.
         
@@ -78,6 +81,8 @@ class WorldOS:
             gamma: Friction coefficient for physics
             sigma: Noise intensity for physics
             tick_duration: Duration of each physics tick (in time units)
+            llm_model: LLM model to use (gpt-4, gpt-3.5-turbo, etc.)
+            llm_api_key: OpenAI API key (or set OPENAI_API_KEY env var)
         """
         print("\n" + "="*70)
         print("🌍 WORLDOS INITIALIZATION")
@@ -95,6 +100,9 @@ class WorldOS:
         
         print("  Initializing database...")
         self.db = MarkdownDB(root_dir=world_state_dir)
+        
+        print("  Initializing LLM agent...")
+        self.llm = LLMAgent(model=llm_model, api_key=llm_api_key)
         
         print("  Initializing potential field...")
         self.potential = PotentialField()
@@ -209,10 +217,7 @@ class WorldOS:
         llm_decision = None
         
         if llm_intervention:
-            # This is where we would call GPT-4 to analyze the trajectory
-            # and decide on interventions
-            # For now, we'll use rule-based logic as a placeholder
-            
+            # Decode states for LLM analysis
             decoded_initial = self.manifold.decode_state(initial_point)
             decoded_final = self.manifold.decode_state(final_point)
             
@@ -221,11 +226,43 @@ class WorldOS:
             print(f"  Final:   Level={decoded_final['level']}, "
                   f"Stance={decoded_final['stance']}")
             
-            # Simple rule: If moved significantly, flag it
-            if distance > 1.0:
+            # Prepare trajectory stats for LLM
+            trajectory_stats = {
+                'distance': distance,
+                'drift': float(np.linalg.norm(final_point - initial_point)),
+                'volatility': float(np.std(np.diff(trajectory, axis=0))) if len(trajectory) > 1 else 0.0
+            }
+            
+            # Get entity context from database
+            entity_data = self.db.read_entity(entity_id)
+            entity_context = entity_data['body'] if entity_data else ""
+            
+            # Use LLM to analyze trajectory
+            analysis = self.llm.analyze_trajectory(
+                initial_state=decoded_initial,
+                final_state=decoded_final,
+                trajectory_stats=trajectory_stats,
+                entity_context=entity_context[:500]  # Limit context length
+            )
+            
+            print(f"  📊 Analysis ({analysis.get('model', 'unknown')}): {analysis.get('analysis', '')[:100]}...")
+            
+            # Decide whether to intervene
+            decision = self.llm.decide_intervention(analysis)
+            
+            if decision.get('should_intervene', False):
                 intervention_made = True
-                llm_decision = "Significant movement detected. Monitoring closely."
+                llm_decision = decision.get('reasoning', 'Intervention recommended')
                 print(f"  ⚠️  Intervention: {llm_decision}")
+                
+                # Apply recommended actions (if any)
+                actions = decision.get('recommended_actions', [])
+                if actions:
+                    print(f"  📋 Recommended actions:")
+                    for action in actions[:3]:  # Limit to top 3
+                        print(f"      - {action}")
+            else:
+                print(f"  ✓ No intervention needed (confidence: {decision.get('confidence', 0):.2f})")
         else:
             print("  ⏭️  Skipped (llm_intervention=False)")
         
