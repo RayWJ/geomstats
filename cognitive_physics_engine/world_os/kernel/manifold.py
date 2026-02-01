@@ -180,13 +180,15 @@ class CognitiveMetric(RiemannianMetric):
         friction = self.friction_map.get_friction_at(base_point)
         friction_factor = 1.0 + 5.0 * friction  # Amplify effect
         
-        # 3. Shadow warping (W-axis effect)
+        # 3. Shadow warping (W-axis effect) - WITH NUMERICAL STABILITY
         w_idx = self.dim_h + self.dim_s + 1  # Index of W coordinate
         if len(base_point) > w_idx:
             w_value = base_point[w_idx]
             # Shadow (w < 0) creates strong warping
+            # But cap at reasonable level to avoid overflow
             if w_value < -0.3:
-                shadow_factor = np.exp(10.0 * abs(w_value + 0.3))
+                exponent = min(10.0 * abs(w_value + 0.3), 20.0)  # Cap at 20
+                shadow_factor = np.exp(exponent)
             else:
                 shadow_factor = 1.0
         else:
