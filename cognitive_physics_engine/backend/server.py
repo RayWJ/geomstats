@@ -247,6 +247,121 @@ async def get_examples():
     }
 
 
+# ==================== VISUALIZATION ENDPOINTS ====================
+
+@app.get("/visualization/data")
+async def get_visualization_data():
+    """Get complete visualization data for manifold rendering."""
+    try:
+        from cpe.manifold_visualizer import ManifoldVisualizer
+        from cpe.raywu_manifold import RaywuCognitiveManifold
+        from cpe.deep_state_agent_geometric import DeepStateEngineGeometric, Agent, AgentRole
+        
+        # Initialize
+        manifold = RaywuCognitiveManifold()
+        visualizer = ManifoldVisualizer(manifold)
+        
+        # Create sample agents
+        engine = DeepStateEngineGeometric(manifold)
+        agents = engine.initialize_agents_from_question(
+            "What is the future of AI?",
+            domains=["tech", "finance", "ethics"]
+        )
+        
+        # Generate visualization data
+        viz_data = visualizer.generate_complete_visualization(agents)
+        
+        return viz_data
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Visualization error: {str(e)}")
+
+
+@app.post("/visualization/agents")
+async def visualize_custom_agents(request: QueryRequest):
+    """Generate visualization data for a custom query."""
+    try:
+        from cpe.manifold_visualizer import ManifoldVisualizer
+        from cpe.raywu_manifold import RaywuCognitiveManifold
+        from cpe.deep_state_agent_geometric import DeepStateEngineGeometric
+        
+        # Initialize
+        manifold = RaywuCognitiveManifold()
+        visualizer = ManifoldVisualizer(manifold)
+        
+        # Run simulation
+        engine = DeepStateEngineGeometric(manifold)
+        agents = engine.initialize_agents_from_question(
+            request.question,
+            domains=["tech", "finance", "politics"]
+        )
+        
+        # Run a few loops to get dynamics
+        engine.run_agent_loop(max_loops=5)
+        
+        # Generate visualization
+        viz_data = visualizer.generate_complete_visualization(engine.agents)
+        viz_data["question"] = request.question
+        viz_data["loops"] = engine.loop_count
+        
+        return viz_data
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Visualization error: {str(e)}")
+
+
+@app.get("/visualization/geodesic")
+async def compute_geodesic_visualization(
+    level1: int = 1,
+    domain1: str = "tech",
+    stance1: float = 0.8,
+    level2: int = 5,
+    domain2: str = "finance",
+    stance2: float = -0.8
+):
+    """Compute and visualize a geodesic between two points."""
+    try:
+        from cpe.manifold_visualizer import ManifoldVisualizer
+        from cpe.raywu_manifold import RaywuCognitiveManifold
+        
+        manifold = RaywuCognitiveManifold()
+        visualizer = ManifoldVisualizer(manifold)
+        
+        # Encode two points
+        point1 = manifold.encode_agent_state(level1, domain1, stance1, 0.5, 0.0, 0.0)
+        point2 = manifold.encode_agent_state(level2, domain2, stance2, -0.5, 0.0, 0.0)
+        
+        # Compute geodesic
+        geodesic_points = visualizer.compute_geodesic(point1, point2, n_steps=50)
+        
+        # Project to Poincaré disk
+        poincare_geodesic = []
+        for pt in geodesic_points:
+            disk_pt = visualizer.project_to_poincare_disk(pt[:2])[0]
+            poincare_geodesic.append(disk_pt.tolist())
+        
+        # Compute distance
+        distance = manifold.cognitive_distance(point1, point2)
+        
+        return {
+            "geodesic": poincare_geodesic,
+            "distance": float(distance),
+            "point1": {
+                "level": level1,
+                "domain": domain1,
+                "stance": stance1
+            },
+            "point2": {
+                "level": level2,
+                "domain": domain2,
+                "stance": stance2
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Geodesic error: {str(e)}")
+
+
 if __name__ == "__main__":
     # Run the server
     uvicorn.run(
