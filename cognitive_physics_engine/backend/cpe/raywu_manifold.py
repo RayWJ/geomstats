@@ -38,7 +38,7 @@ class RaywuMetric(RiemannianMetric):
     """
     
     def __init__(self, dim, base_manifold=None):
-        super().__init__(dim=dim, signature=(dim, 0))
+        self.dim = dim
         self.base_manifold = base_manifold
         self.dim_mapping = {
             'Z': (0, 2),    # Z-axis: Level (L1-L5) - Hyperbolic
