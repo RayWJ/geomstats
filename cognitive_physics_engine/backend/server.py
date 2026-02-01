@@ -11,6 +11,8 @@ Provides REST API endpoints for:
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uvicorn
@@ -74,6 +76,11 @@ app.add_middleware(
 # Global simulator instance
 simulator = None
 
+# Mount static files for frontend
+frontend_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+if os.path.exists(frontend_dir):
+    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -91,23 +98,6 @@ async def startup_event():
     print("✓ API Ready!\n")
 
 
-@app.get("/")
-async def root():
-    """Root endpoint with API information."""
-    return {
-        "name": "Cognitive Physics Engine API",
-        "version": "0.1.0",
-        "description": "A prototype 'World Simulator' that computes truth in curved space",
-        "endpoints": {
-            "/query": "POST - Query the simulator",
-            "/inject": "POST - Inject new information",
-            "/compare": "POST - Compare scenarios",
-            "/health": "GET - Health check",
-            "/docs": "GET - API documentation"
-        }
-    }
-
-
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
@@ -115,6 +105,127 @@ async def health_check():
         "status": "healthy",
         "simulator_initialized": simulator is not None
     }
+
+
+@app.get("/viz", response_class=HTMLResponse)
+async def visualization_page():
+    """Serve the 3D visualization page."""
+    frontend_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+    viz_file = os.path.join(frontend_dir, 'manifold_viz.html')
+    
+    if os.path.exists(viz_file):
+        with open(viz_file, 'r') as f:
+            content = f.read()
+            # Replace localhost with actual URL
+            content = content.replace('http://localhost:8000', '')
+            return HTMLResponse(content=content)
+    else:
+        raise HTTPException(status_code=404, detail="Visualization page not found")
+
+
+@app.get("/ui", response_class=HTMLResponse)
+async def ui_page():
+    """Serve the original UI page."""
+    frontend_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+    ui_file = os.path.join(frontend_dir, 'index.html')
+    
+    if os.path.exists(ui_file):
+        return FileResponse(ui_file)
+    else:
+        raise HTTPException(status_code=404, detail="UI page not found")
+
+
+@app.get("/")
+async def root():
+    """Root endpoint with links to visualizations."""
+    return HTMLResponse(content="""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Cognitive Physics Engine</title>
+        <style>
+            body {
+                font-family: 'Monaco', 'Courier New', monospace;
+                background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+                color: #00ff88;
+                padding: 50px;
+                text-align: center;
+            }
+            h1 {
+                font-size: 36px;
+                text-shadow: 0 0 20px #00ff88;
+                margin-bottom: 20px;
+            }
+            .subtitle {
+                font-size: 16px;
+                color: #aaa;
+                margin-bottom: 50px;
+            }
+            .links {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                flex-wrap: wrap;
+            }
+            .link-card {
+                background: rgba(0, 255, 136, 0.1);
+                border: 2px solid #00ff88;
+                padding: 30px;
+                border-radius: 10px;
+                text-decoration: none;
+                color: #00ff88;
+                transition: all 0.3s;
+                min-width: 250px;
+            }
+            .link-card:hover {
+                background: rgba(0, 255, 136, 0.3);
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            }
+            .link-title {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            .link-desc {
+                font-size: 12px;
+                color: #aaa;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🎯 RAYWU COGNITIVE PHYSICS ENGINE v11.0</h1>
+        <p class="subtitle">Computing Truth in Curved Riemannian Space</p>
+        
+        <div class="links">
+            <a href="/viz" class="link-card">
+                <div class="link-title">🎨 3D Manifold Visualization</div>
+                <div class="link-desc">Poincaré Disk • Sphere • Geodesics • Metric Heatmap</div>
+            </a>
+            
+            <a href="/ui" class="link-card">
+                <div class="link-title">💬 Query Interface</div>
+                <div class="link-desc">Ask questions • Run simulations • View consensus</div>
+            </a>
+            
+            <a href="/docs" class="link-card">
+                <div class="link-title">📚 API Documentation</div>
+                <div class="link-desc">Swagger UI • Interactive testing</div>
+            </a>
+            
+            <a href="/visualization/data" class="link-card">
+                <div class="link-title">📊 Visualization Data</div>
+                <div class="link-desc">JSON API • Real-time agent positions</div>
+            </a>
+        </div>
+        
+        <div style="margin-top: 80px; font-size: 12px; color: #666;">
+            <p>Built with Geomstats • PyTorch • FastAPI • Three.js</p>
+            <p>H² × S² × R⁴ • Frechet Mean • Geodesic Distances</p>
+        </div>
+    </body>
+    </html>
+    """)
 
 
 @app.post("/query", response_model=QueryResponse)
