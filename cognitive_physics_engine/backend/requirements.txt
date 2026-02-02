@@ -1,0 +1,22 @@
+# Cognitive Physics Engine - Backend Requirements
+
+# Core dependencies
+numpy>=1.21.0
+torch>=2.0.0
+geomstats>=2.7.0
+
+# API framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Optional: For advanced ODE solvers
+# torchdiffeq>=0.2.3
+
+# Visualization
+matplotlib>=3.5.0
+
+# Development
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0

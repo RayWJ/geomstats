@@ -1,0 +1,192 @@
+/home/user/webapp/cognitive_physics_engine/backend/server.py:85: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+INFO:     Will watch for changes in these directories: ['/home/user/webapp/cognitive_physics_engine/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [3022] using StatReload
+INFO:     Started server process [3035]
+INFO:     Waiting for application startup.
+
+🚀 Starting Cognitive Physics Engine API...
+🌍 Initializing World Simulator...
+  📐 Creating cognitive manifold (6D Riemannian space)...
+  ⚛️  Initializing dynamics (Neural ODE engine)...
+  🧠 Connecting translator (LLM ↔ Geometry bridge)...
+✓ World Simulator ready!
+
+✓ API Ready!
+
+INFO:     Application startup complete.
+INFO:     127.0.0.1:39442 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.64.63.156:55434 - "GET / HTTP/1.1" 200 OK
+INFO:     10.64.63.156:55434 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     10.64.63.156:55434 - "GET /viz HTTP/1.1" 200 OK
+INFO:     10.64.63.156:55434 - "GET /visualization_data.json HTTP/1.1" 404 Not Found
+INFO:     10.64.63.156:46266 - "GET /ui HTTP/1.1" 200 OK
+INFO:     10.64.63.156:46266 - "GET /health HTTP/1.1" 200 OK
+
+============================================================
+📝 QUERY: What is the outlook for NVIDIA stock?
+============================================================
+
+🌱 Generating 100 diverse viewpoints...
+   Initial spread: 0.2931
+   Time: 0.036s
+
+⚡ Simulating collapse (T=10.0s, dt=0.1)...
+   Final spread: 0.2931
+   Convergence: 0.0%
+   Time: 2.685s
+
+🎯 Analyzing equilibrium clusters...
+   Found 46 cluster(s)
+   - Cluster 1: 8 viewpoints
+   - Cluster 2: 1 viewpoints
+   - Cluster 3: 2 viewpoints
+   - Cluster 4: 4 viewpoints
+   - Cluster 5: 11 viewpoints
+   - Cluster 6: 1 viewpoints
+   - Cluster 7: 6 viewpoints
+   - Cluster 8: 1 viewpoints
+   - Cluster 9: 1 viewpoints
+   - Cluster 10: 9 viewpoints
+   - Cluster 11: 2 viewpoints
+   - Cluster 12: 1 viewpoints
+   - Cluster 13: 1 viewpoints
+   - Cluster 14: 1 viewpoints
+   - Cluster 15: 3 viewpoints
+   - Cluster 16: 3 viewpoints
+   - Cluster 17: 2 viewpoints
+   - Cluster 18: 4 viewpoints
+   - Cluster 19: 1 viewpoints
+   - Cluster 20: 1 viewpoints
+   - Cluster 21: 4 viewpoints
+   - Cluster 22: 2 viewpoints
+   - Cluster 23: 2 viewpoints
+   - Cluster 24: 1 viewpoints
+   - Cluster 25: 1 viewpoints
+   - Cluster 26: 2 viewpoints
+   - Cluster 27: 2 viewpoints
+   - Cluster 28: 1 viewpoints
+   - Cluster 29: 1 viewpoints
+   - Cluster 30: 1 viewpoints
+   - Cluster 31: 1 viewpoints
+   - Cluster 32: 1 viewpoints
+   - Cluster 33: 1 viewpoints
+   - Cluster 34: 1 viewpoints
+   - Cluster 35: 1 viewpoints
+   - Cluster 36: 3 viewpoints
+   - Cluster 37: 1 viewpoints
+   - Cluster 38: 1 viewpoints
+   - Cluster 39: 1 viewpoints
+   - Cluster 40: 2 viewpoints
+   - Cluster 41: 2 viewpoints
+   - Cluster 42: 1 viewpoints
+   - Cluster 43: 1 viewpoints
+   - Cluster 44: 1 viewpoints
+   - Cluster 45: 1 viewpoints
+   - Cluster 46: 1 viewpoints
+   Time: 0.031s
+
+💭 Synthesizing consensus...
+   Confidence: 0.00%
+   Time: 0.000s
+
+============================================================
+✨ CONSENSUS: Strategic assessment suggests, the consensus is a neutral stance with high confidence.
+============================================================
+
+INFO:     10.64.63.156:46266 - "POST /query HTTP/1.1" 200 OK
+INFO:     10.64.63.156:43148 - "GET /viz HTTP/1.1" 200 OK
+INFO:     10.64.63.156:43148 - "GET /visualization_data.json HTTP/1.1" 404 Not Found
+WARNING:  StatReload detected changes in 'cpe/raywu_manifold_strict.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3035]
+INFO:     Started server process [3222]
+INFO:     Waiting for application startup.
+
+🚀 Starting Cognitive Physics Engine API...
+🌍 Initializing World Simulator...
+  📐 Creating cognitive manifold (6D Riemannian space)...
+  ⚛️  Initializing dynamics (Neural ODE engine)...
+  🧠 Connecting translator (LLM ↔ Geometry bridge)...
+✓ World Simulator ready!
+
+✓ API Ready!
+
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'cpe/raywu_manifold_strict.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3222]
+INFO:     Started server process [3255]
+INFO:     Waiting for application startup.
+
+🚀 Starting Cognitive Physics Engine API...
+🌍 Initializing World Simulator...
+  📐 Creating cognitive manifold (6D Riemannian space)...
+  ⚛️  Initializing dynamics (Neural ODE engine)...
+  🧠 Connecting translator (LLM ↔ Geometry bridge)...
+✓ World Simulator ready!
+
+✓ API Ready!
+
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'cpe/raywu_manifold_strict.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3255]
+INFO:     Started server process [3284]
+INFO:     Waiting for application startup.
+
+🚀 Starting Cognitive Physics Engine API...
+🌍 Initializing World Simulator...
+  📐 Creating cognitive manifold (6D Riemannian space)...
+  ⚛️  Initializing dynamics (Neural ODE engine)...
+  🧠 Connecting translator (LLM ↔ Geometry bridge)...
+✓ World Simulator ready!
+
+✓ API Ready!
+
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'cpe/raywu_manifold_strict.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3284]
+WARNING:  StatReload detected changes in 'cpe/raywu_manifold_strict.py'. Reloading...
+INFO:     Started server process [3321]
+INFO:     Waiting for application startup.
+
+🚀 Starting Cognitive Physics Engine API...
+🌍 Initializing World Simulator...
+  📐 Creating cognitive manifold (6D Riemannian space)...
+  ⚛️  Initializing dynamics (Neural ODE engine)...
+  🧠 Connecting translator (LLM ↔ Geometry bridge)...
+✓ World Simulator ready!
+
+✓ API Ready!
+
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'cpe/manifold_visualizer_strict.py'. Reloading...
+INFO:     Started server process [3481]
+INFO:     Waiting for application startup.
+
+🚀 Starting Cognitive Physics Engine API...
+🌍 Initializing World Simulator...
+  📐 Creating cognitive manifold (6D Riemannian space)...
+  ⚛️  Initializing dynamics (Neural ODE engine)...
+  🧠 Connecting translator (LLM ↔ Geometry bridge)...
+✓ World Simulator ready!
+
+✓ API Ready!
+
+INFO:     Application startup complete.
